@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\User;
 
 use JWTAuth;
+use JWTFactory;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Validator, DB, Hash, Mail;
 use Illuminate\Support\Facades\Password;
@@ -25,7 +26,7 @@ class AuthController extends Controller
         
         $credentials = $request->only('name', 'email', 'idRegistration', 'cpf');
         
-        /* $rules = [
+        $rules = [
             'name' => 'required|max:255',
             'cpf' => 'required|max:11',
             'email' => 'required|email|max:255|unique:users'
@@ -35,7 +36,7 @@ class AuthController extends Controller
         
         if($validator->fails()) {
             return response()->json(['success'=> false, 'error'=> $validator->messages()]);
-        } */
+        }
 
         $name = $request->name;
         $email = $request->email;
@@ -107,11 +108,11 @@ class AuthController extends Controller
      */
     public function login(Request $request)
     {
-        $credentials = $request->only('cpf', 'idRgistration');
+        $credentials = $request->only('cpf', 'idRegistration');
         
         $rules = [
-            'cpf' => 'required|cpf',
-            'idRgistration' => 'required',
+            'cpf' => 'required',
+            'idRegistration' => 'required',
         ];
         
         $validator = Validator::make($credentials, $rules);
@@ -119,15 +120,24 @@ class AuthController extends Controller
         if($validator->fails()) {
             return response()->json(['success'=> false, 'error'=> $validator->messages()], 401);
         }
+
+        $user = User::where([
+                ['cpf', $request->get('cpf')],
+                ['idRegistration', $request->get('idRegistration')]
+            ]
+        )->first();
         
-        $credentials['is_verified'] = 1;
-        
+        if($user->is_verified == 0)
+        {
+            return response()->json(['success' => false, 'error' => 'User not verified.'], 404);
+        }
+
         try
         {
             // attempt to verify the credentials and create a token for the user
-            if (!$token = JWTAuth::attempt($credentials))
+            if (! $token = JWTAuth::fromUser($user))
             {
-                return response()->json(['success' => false, 'error' => 'We cant find an account with this credentials. Please make sure you entered the right information and you have verified your email address.'], 404);
+                return response()->json(['success' => false, 'error' => 'We cant find an account with this credentials.'], 404);
             }
         }
         catch (JWTException $e)
@@ -137,7 +147,7 @@ class AuthController extends Controller
         }
 
         // all good so return the token
-        return response()->json(['success' => true, 'data'=> [ 'token' => $token ]], 200);
+        return response()->json(['success' => true, 'data'=> ['token' => $token]], 200);
     }
 
     /**
@@ -147,7 +157,8 @@ class AuthController extends Controller
      *
      * @param Request $request
      */
-    public function logout(Request $request) {
+    public function logout(Request $request)
+    {
         $this->validate($request, ['token' => 'required']);
         
         try
@@ -160,37 +171,5 @@ class AuthController extends Controller
             // something went wrong whilst attempting to encode the token
             return response()->json(['success' => false, 'error' => 'Failed to logout, please try again.'], 500);
         }
-    }
-
-     /**
-     * API Recover Password
-     *
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function recover(Request $request)
-    {
-        $user = User::where('email', $request->email)->first();
-        if (!$user)
-        {
-            $error_message = "Your email address was not found.";
-            return response()->json(['success' => false, 'error' => ['email'=> $error_message]], 401);
-        }
-        try 
-        {
-            Password::sendResetLink($request->only('email'), function (Message $message) {
-                $message->subject('Your Password Reset Link');
-            });
-        } 
-        catch (\Exception $e)
-        {
-            //Return with error
-            $error_message = $e->getMessage();
-            return response()->json(['success' => false, 'error' => $error_message], 401);
-        }
-
-        return response()->json([
-            'success' => true, 'data'=> ['message'=> 'A reset email has been sent! Please check your email.']
-        ]);
     }
 }

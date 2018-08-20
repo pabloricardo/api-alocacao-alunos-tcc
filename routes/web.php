@@ -14,3 +14,5 @@
 Route::get('/', function () {
     return redirect('api');
 });
+
+Route::get('user/verify/{verification_code}', 'AuthController@verifyUser');

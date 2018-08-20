@@ -17,5 +17,5 @@ Route::get('/', function(){
     return response()->json(['status' => 'OK', 'message' => 'API connected']);
 });
 
-Route::post('login', 'AuthController@login');
 Route::post('register', 'AuthController@register');
+Route::post('login', 'AuthController@login');
