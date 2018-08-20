@@ -16,11 +16,10 @@ class CreateStudentsTable extends Migration
         Schema::create('students', function (Blueprint $table) {
             $table->increments('id');
             
-            $table->string('idRgistration')->unique();
-            $table->string('name', 50);
-            $table->string('cpf', 11)->unique();
-            $table->string('email', 50)->unique();
             $table->string('curse', 30);
+
+            $table->integer('userId')->unsigned();
+            $table->foreign('userId')->references('id')->on('users');
 
             $table->integer('teacthcerId')->unsigned();
             $table->foreign('teacthcerId')->references('id')->on('teatchers');
