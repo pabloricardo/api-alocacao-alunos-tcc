@@ -53,15 +53,16 @@ class AuthController extends Controller
             \DB::beginTransaction();
 
             $user = $this->userService->createUser($request);
+
             if ($user)
             {
-                if($request->get('type') == "student")
+                if(strtoupper($request->get('type')) == "STUDENT")
                 {
                     $complementUser = $this->userService->createStudent($request, $user->id);
                 }
                 else
                 {
-                    $complementUser = $this->userService->createTeatcherOrAdm($request, $user->id);
+                    $complementUser = $this->userService->createTeacherOrAdm($request, $user->id);
                 }
             }
             else 
@@ -71,7 +72,10 @@ class AuthController extends Controller
                     'success'=> false,
                     'error'=> "error"
                 ]);
-            }           
+            }
+            
+            $name = $request->get('name');
+            $email = $request->get('email');
 
             $verification_code = str_random(30); //Generate verification code
 

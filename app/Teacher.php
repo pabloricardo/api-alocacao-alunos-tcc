@@ -4,7 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Teatcher extends Model
+class Teacher extends Model
 {
     protected $fillable = [
         'type',
@@ -13,10 +13,18 @@ class Teatcher extends Model
     ];
 
     /**
-     * Table user relationship with phones
+     * Table teacher relationship with user
      */
     public function users()
     {
         return $this->belongsTo('App\User');
+    }
+
+    /**
+     * Table teacher relationship with student
+     */
+    public function students()
+    {
+        return $this->hasMany('App\Student', 'teacherId');
     }
 }

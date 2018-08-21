@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateTeatchersTable extends Migration
+class CreateTeachersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,10 @@ class CreateTeatchersTable extends Migration
      */
     public function up()
     {
-        Schema::create('teatchers', function (Blueprint $table) {
+        Schema::create('teachers', function (Blueprint $table) {
             $table->increments('id');
 
-            $table->enum('type', ['ADM', 'TEATCHER']);
+            $table->enum('type', ['ADM', 'TEACHER']);
             $table->integer('studentLimit');
 
             $table->integer('userId')->unsigned();
@@ -33,6 +33,6 @@ class CreateTeatchersTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('teatchers');
+        Schema::dropIfExists('teachers');
     }
 }

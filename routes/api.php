@@ -19,3 +19,7 @@ Route::get('/', function(){
 
 Route::post('register', 'AuthController@register');
 Route::post('login', 'AuthController@login');
+
+Route::resource('student', 'StudentsController', ['except' => [
+        'store', 'index'
+    ]]); 

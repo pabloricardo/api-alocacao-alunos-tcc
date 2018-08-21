@@ -9,7 +9,11 @@ class Student extends Model
     protected $fillable = [
         'curse',
         'userId',
-        'teacthcerId',
+        'teacherId',
+    ];
+
+    protected $hidden = [
+        'id'
     ];
 
     /**
@@ -17,6 +21,14 @@ class Student extends Model
      */
     public function users()
     {
-        return $this->belongsTo('App\User');
+        return $this->belongsTo('App\User', 'userId');
+    }
+    
+    /**
+     * Table user relationship with phones
+     */
+    public function teachers()
+    {
+        return $this->belongsTo('App\Teacher', 'teacherId');
     }
 }

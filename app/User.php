@@ -39,14 +39,14 @@ class User extends Authenticatable implements JWTSubject
      */
     public function students()
     {
-        return $this->hasMany('App\Student');
+        return $this->hasMany('App\Student', 'userId');
     }
 
     /**
-     * Table teatchers relationship with user
+     * Table teachers relationship with user
      */
-    public function teatchers()
+    public function teachers()
     {
-        return $this->hasMany('App\Teatcher');
+        return $this->hasMany('App\Teacher', 'userId');
     }
 }
