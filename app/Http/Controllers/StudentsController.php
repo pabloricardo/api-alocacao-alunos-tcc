@@ -103,18 +103,8 @@ class StudentsController extends Controller
             $user['user']->fill($request->all());
             $user['user']->save();
 
-            $optionsStudent = [];
-
-            if($request->get('curse') != "")
-            {
-                $optionsStudent['curse'] = $request->get('curse');
-            }
-            if($request->get('idTeacher') != "")
-            {
-                $optionsStudent['idTeacher'] = $request->get('idTeacher');
-            }
-
-            $user['user']->students()->update($optionsStudent);
+            $user['student']->fill($request->all());
+            $user['student']->save();
 
             \DB::commit();
             return response()->json(['data' => true, 'message' => 'Student updated']);

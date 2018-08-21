@@ -21,5 +21,9 @@ Route::post('register', 'AuthController@register');
 Route::post('login', 'AuthController@login');
 
 Route::resource('student', 'StudentsController', ['except' => [
-        'store', 'index'
-    ]]); 
+    'store', 'index'
+]]);
+
+Route::resource('teacher', 'TeacherController', ['except' => [
+    'store', 'index'
+]]);

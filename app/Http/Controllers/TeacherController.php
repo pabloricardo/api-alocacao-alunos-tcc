@@ -101,19 +101,9 @@ class TeacherController extends Controller
 
             $user['user']->fill($request->all());
             $user['user']->save();
-
-            $optionsTeacher = [];
-
-            if($request->get('type') != "")
-            {
-                $optionsTeacher['type'] = $request->get('type');
-            }
-            if($request->get('studentLimit') != "")
-            {
-                $optionsTeacher['studentLimit'] = $request->get('studentLimit');
-            }
-
-            $user['user']->teachers()->update($optionsTeacher);
+            
+            $user['teacher']->fill($request->all());
+            $user['teacher']->save();
 
             \DB::commit();
             return response()->json(['data' => true, 'message' => 'Teacher updated']);
@@ -135,7 +125,7 @@ class TeacherController extends Controller
     {
         try
         {
-            $user = $this->service->getStudent($id);
+            $user = $this->service->getTeacher($id);
 
             if($user == false)
             {
