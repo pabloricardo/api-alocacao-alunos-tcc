@@ -6,12 +6,19 @@ use Illuminate\Http\Request;
 
 use App\Student;
 use App\User;
+use App\NotificableTeacher;
+use App\Teacher;
+use App\Area;
 
 use App\Service\UserService;
 
 class StudentsController extends Controller
 {
     private $service;
+    private $notificableTeacher;
+    private $teacher;
+    private $user;
+    private $area;
 
     /**
      * Construct
@@ -19,6 +26,10 @@ class StudentsController extends Controller
     public function __construct()
     {
         $this->service = new UserService();
+        $this->notificableTeacher = new NotificableTeacher();
+        $this->teacher = new Teacher();
+        $this->user = new User();
+        $this->area = new Area();
     }
 
     /**
@@ -145,6 +156,68 @@ class StudentsController extends Controller
         catch (\Exception $e)
         {
             \DB::rollBack();
+            return response()->json(["data" => false, "error" => $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Student request a teacher to guide on TCC
+     * 
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id id student
+     * @return \Illuminate\Http\Response
+     */
+    public function studentRequestTeacher(request $request, $id)
+    {
+        try
+        {
+            $teacherId = $request->get('teacherId');
+            $areaId = $request->get('area');
+
+            $teacherUse = $this->teacher->find($teacherId);
+            $studentUse = $this->student->find($id);
+
+            $numberStudents = $this->student->getCountNumberSutdents($teacherId);
+            
+            if(!$teacherUse || $numberStudents >= $teacherUse->studentLimit)
+            {
+                return response()->json(["data" => false, "error" => "Error on request"]);
+            }
+            
+            $userteacher = $this->user->find($teacherUse->userId);
+            $userStudent = $this->user->find($studentUse->userId);
+            $area        = $this->area->find($areaId);
+
+            if (!$userteacher || $userStudent || $area)
+            {
+                return response()->json(["data" => false, "error" => "Error on request"]);
+            }
+
+            $notificable = $this->notificableTeacher->create([
+                'teacherGuide' => 'N',
+                'answered' => 'N',
+                'teacherId' => $teacherId,
+                'studentId' => $id,
+                'areaId' => $areaId
+            ]);
+
+            $name        = $userteacher->name;
+            $nameStudent = $userStudent->name;
+            $email       = $userteacher->email;
+            $nameArea    = $area->name;
+
+            $subject = "New Request of studetn to guide.";
+
+            Mail::send('email.request', ['name' => $name, 'email' => $email, 'nameStudent' => $nameStudent, 'idNotificable' => $notificable->id, "nameArea" => $nameArea],
+                function ($mail) use ($email, $name, $subject) {
+                    $mail->from("noreplay@alocacaoalunostcc.com", "Alocação alunos TCC");
+                    $mail->to($email, $name);
+                    $mail->subject($subject);
+                }
+            );
+        }
+        catch (\Exception $e)
+        {
             return response()->json(["data" => false, "error" => $e->getMessage()]);
         }
     }
