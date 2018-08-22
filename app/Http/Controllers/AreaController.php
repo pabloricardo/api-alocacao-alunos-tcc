@@ -47,9 +47,12 @@ class AreaController extends Controller
     {
         try
         {
-            $newArea = $this->area->fill($request->all());
+            //$newArea = $this->area->fill($request->all());
+            //$newArea->save();
+            $newArea = $this->area->create([
+                'name' => $request->get('name')
+            ]);
 
-            $newArea->save();
 
             return response()->json(["data" => true, "message" => "New area created successfully"]);
         }
@@ -141,8 +144,6 @@ class AreaController extends Controller
             {
                 return response()->json(["data" => false, "error" => "Area not found"]);
             }
-
-            $deleteArea->ocupationArea()->delete();
 
             $deleteArea->delete();
 

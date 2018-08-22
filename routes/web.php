@@ -16,4 +16,4 @@ Route::get('/', function () {
 });
 
 Route::get('user/verify/{verification_code}', 'AuthController@verifyUser');
-Route::get('teacher-accept-student/{answer}/{noificable}', 'TeacherController@teacherAcepptStudent');
+Route::get('teacher-accept-student/{answer}/{notificable}', 'TeacherController@teacherAcepptStudent');

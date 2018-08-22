@@ -9,6 +9,7 @@ use App\User;
 use App\NotificableTeacher;
 use App\Teacher;
 use App\Area;
+use Mail;
 
 use App\Service\UserService;
 
@@ -19,6 +20,7 @@ class StudentsController extends Controller
     private $teacher;
     private $user;
     private $area;
+    private $student;
 
     /**
      * Construct
@@ -30,6 +32,7 @@ class StudentsController extends Controller
         $this->teacher = new Teacher();
         $this->user = new User();
         $this->area = new Area();
+        $this->student = new Student();
     }
 
     /**
@@ -171,31 +174,34 @@ class StudentsController extends Controller
     {
         try
         {
+            \DB::beginTransaction();
             $teacherId = $request->get('teacherId');
-            $areaId = $request->get('area');
+            $areaId = $request->get('areaId');
 
             $teacherUse = $this->teacher->find($teacherId);
             $studentUse = $this->student->find($id);
 
-            $numberStudents = $this->student->getCountNumberSutdents($teacherId);
+            $numberStudents = $this->student->getNumberStudetnsByTeacher($teacherId);
             
-            if(!$teacherUse || $numberStudents >= $teacherUse->studentLimit)
+            if(!$teacherUse || $numberStudents[0]->numberStudents >= $teacherUse->studentLimit)
             {
+                \DB::rollBack();
                 return response()->json(["data" => false, "error" => "Error on request"]);
             }
             
             $userteacher = $this->user->find($teacherUse->userId);
             $userStudent = $this->user->find($studentUse->userId);
             $area        = $this->area->find($areaId);
-
-            if (!$userteacher || $userStudent || $area)
+            
+            if (!$userteacher || !$userStudent || !$area)
             {
+                \DB::rollBack();
                 return response()->json(["data" => false, "error" => "Error on request"]);
             }
 
             $notificable = $this->notificableTeacher->create([
-                'teacherGuide' => 'N',
-                'answered' => 'N',
+                'teacherGuide' => 'NO',
+                'answered' => 'NO',
                 'teacherId' => $teacherId,
                 'studentId' => $id,
                 'areaId' => $areaId
@@ -215,9 +221,13 @@ class StudentsController extends Controller
                     $mail->subject($subject);
                 }
             );
+
+            \DB::commit();
+            return response()->json(["data" => true, "message" => "Notifation send to your teacher"]);
         }
         catch (\Exception $e)
         {
+            \DB::rollBack();
             return response()->json(["data" => false, "error" => $e->getMessage()]);
         }
     }

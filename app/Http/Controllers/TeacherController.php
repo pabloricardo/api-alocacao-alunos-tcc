@@ -15,6 +15,7 @@ class TeacherController extends Controller
     private $service;
     private $student;
     private $notificableTeacher;
+    private $user;
 
     /**
      * Construct
@@ -24,6 +25,7 @@ class TeacherController extends Controller
         $this->service = new UserService();
         $this->student = new Student();
         $this->notificableTeacher = new NotificableTeacher();
+        $this->user = new User();
     }
 
     /**
@@ -160,19 +162,20 @@ class TeacherController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @param int $id Teacher
      */
-    public function teacherAcepptStudent(Request $request, $answer, $id)
+    public function teacherAcepptStudent($answer, $id)
     {
         try
         {
+            
             \DB::beginTransaction();
 
             $notificable = $this->notificableTeacher->find($id);
-
+            
             if(!$notificable)
             {
                 return response()->json(["data" => false, "error" => "Error on request"]);
             }
-
+            
             $notificable->update([
                 'teacherGuide' => $answer,
                 'answered' => 'YES'
@@ -183,7 +186,7 @@ class TeacherController extends Controller
              */
             if($answer == "YES")
             {
-                $student = $this->user->find($notificable->studentId);
+                $student = $this->student->find($notificable->studentId);
 
                 if(!$student)
                 {

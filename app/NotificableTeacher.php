@@ -12,7 +12,7 @@ class NotificableTeacher extends Model
         'answered',
         'teacherId',
         'studentId',
-        'areasId',
+        'areaId',
     ];
 
     /**
