@@ -27,4 +27,12 @@ class Teacher extends Model
     {
         return $this->hasMany('App\Student', 'teacherId');
     }
+
+    /**
+     * Table teacher relationship with user
+     */
+    public function ocupationArea()
+    {
+        return $this->belongsTo('App\OcupationArea', 'teacherId');
+    }
 }
