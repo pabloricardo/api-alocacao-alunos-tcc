@@ -19,13 +19,13 @@ class CreateNotificableTeachersTable extends Migration
             $table->enum('teacherGuide', ['YES', 'NO'])->default('NO');
             $table->enum('answered', ['YES', 'NO'])->default('NO');
 
-            $table->integer('teacherId');
+            $table->integer('teacherId')->unsigned();
             $table->foreign('teacherId')->references('id')->on('teachers');
 
-            $table->integer('studentId');
+            $table->integer('studentId')->unsigned();
             $table->foreign('studentId')->references('id')->on('students');
 
-            $table->integer('areaId');
+            $table->integer('areaId')->unsigned();
             $table->foreign('areaId')->references('id')->on('areas');
 
             $table->timestamps();
