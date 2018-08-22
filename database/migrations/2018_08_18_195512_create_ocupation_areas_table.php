@@ -18,8 +18,8 @@ class CreateOcupationAreasTable extends Migration
             $table->integer('areaId')->unsigned();
             $table->foreign('areaId')->references('id')->on('areas');
             
-            $table->integer('teacthcerId')->unsigned();
-            $table->foreign('teacthcerId')->references('id')->on('teatchers');
+            $table->integer('teacherId')->unsigned();
+            $table->foreign('teacherId')->references('id')->on('teachers');
 
             $table->timestamps();
         });

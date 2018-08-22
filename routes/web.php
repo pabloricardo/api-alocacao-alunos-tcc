@@ -12,5 +12,7 @@
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect('api');
 });
+
+Route::get('user/verify/{verification_code}', 'AuthController@verifyUser');

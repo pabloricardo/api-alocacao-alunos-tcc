@@ -13,6 +13,17 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
+Route::get('/', function(){
+    return response()->json(['status' => 'OK', 'message' => 'API connected']);
 });
+
+Route::post('register', 'AuthController@register');
+Route::post('login', 'AuthController@login');
+
+Route::resource('student', 'StudentsController', ['except' => [
+    'store', 'index'
+]]);
+
+Route::resource('teacher', 'TeacherController', ['except' => [
+    'store', 'index'
+]]);
