@@ -20,23 +20,33 @@ class VerifyJWTToken
      */
     public function handle($request, Closure $next)
     {
-        echo __LINE__; die();
-
-        if (isset($_SERVER['HTTP_TOKEN'])) {
+        if (isset($_SERVER['HTTP_TOKEN']))
+        {
             $token = $_SERVER['HTTP_TOKEN'];
-        } else {
+        } 
+        else
+        {
             $token = $request->input('token');
         }
 
-        try {
+        try
+        {
+            JWTAuth::setToken($token);
             $user = JWTAuth::toUser($token);
-        } catch (JWTException $e) {
-            if ($e instanceof \Tymon\JWTAuth\Exceptions\TokenExpiredException) {
-                return response()->json($this->response->toString(false, $this->messages['token']['expired']));
-            } else if ($e instanceof \Tymon\JWTAuth\Exceptions\TokenInvalidException) {
-                return response()->json($this->response->toString(false, $this->messages['token']['invalid']));
-            } else {
-                return response()->json($this->response->toString(false, $this->messages['token']['riquered']));
+        }
+        catch (JWTException $e)
+        {
+            if ($e instanceof \Tymon\JWTAuth\Exceptions\TokenExpiredException)
+            {
+                return response()->json(["error" => 'token expired']);
+            }
+            else if ($e instanceof \Tymon\JWTAuth\Exceptions\TokenInvalidException)
+            {
+                return response()->json(["error" => 'token invalid']);
+            }
+            else
+            {
+                return response()->json(["error" => 'token riquered']);
             }
         }
         return $next($request);

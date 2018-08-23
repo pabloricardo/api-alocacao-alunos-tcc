@@ -20,7 +20,7 @@ Route::get('/', function(){
 Route::post('register', 'AuthController@register');
 Route::post('login', 'AuthController@login');
 
-Route::group(['middleware' => ['jwt.auth']], function () {
+Route::group(['middleware' => ['jwt-auth']], function () {
 
     Route::get('test', function () {
         return response()->json(['foo' => 'bar']);

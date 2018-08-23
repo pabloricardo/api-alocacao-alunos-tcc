@@ -173,6 +173,11 @@ class AuthController extends Controller
                     ['idRegistration', $request->get('idRegistration')]
                 ]
             )->first();
+
+            if(!$user)
+            {
+                return response()->json(['success' => false, 'error' => 'Credentials not validate.'], 404);
+            }
             
             if($user->is_verified == 0)
             {
