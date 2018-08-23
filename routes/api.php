@@ -27,14 +27,16 @@ Route::group(['middleware' => ['jwt.auth']], function () {
     });
 
     Route::resource('teacher', 'TeacherController', ['except' => [
-        'store', 'index'
+        'store', 'index', 'destroy'
     ]]);
 
     Route::resource('student', 'StudentsController', ['except' => [
-        'store', 'index'
+        'store', 'index', 'destroy'
     ]]);
 
-    Route::resource('area', 'AreaController');
+    Route::resource('area', 'AreaController', ['except' => [
+        'destroy'
+    ]]);
     
     Route::post('student/request-teacher/{student}', 'StudentsController@studentRequestTeacher');
 
