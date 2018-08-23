@@ -97,15 +97,15 @@ class UserService extends Service
      * @param int $userID
      * @return bool or object $response
      */
-    public function getStudent($userID)
+    public function getStudent($studentID)
     {
-        $user = User::find($userID);
+        $student = $this->student->find($studentID);
 
-        if($user)
+        if($student)
         {
-            $student = $user->students()->first();
+            $user = $student->users()->first();
 
-            if(!$student)
+            if(!$user)
             {
                 return false;
             }
@@ -123,15 +123,15 @@ class UserService extends Service
      * @param int $userID
      * @return bool or object $response
      */
-    public function getTeacher($userID)
+    public function getTeacher($teacherID)
     {
-        $user = User::find($userID);
-
-        if($user)
+        $teacher = $this->teacher->find($teacherID);
+        
+        if($teacher)
         {
-            $teacher = $user->teachers()->first();
-
-            if(!$teacher)
+            $user = $teacher->users()->first();
+            
+            if(!$user)
             {
                 return false;
             }

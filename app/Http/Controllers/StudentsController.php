@@ -66,7 +66,7 @@ class StudentsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Request $request, $id)
     {
         try
         {
@@ -105,6 +105,8 @@ class StudentsController extends Controller
     {
         try
         {
+            $this->service->getStudentLogged($request);
+
             $user = $this->service->getStudent($id);
 
             if($user == false)
@@ -140,6 +142,8 @@ class StudentsController extends Controller
     {
         try
         {
+            $this->service->getStudentLogged($request);
+
             $user = $this->service->getStudent($id);
 
             if($user == false)
@@ -175,6 +179,9 @@ class StudentsController extends Controller
         try
         {
             \DB::beginTransaction();
+
+            $this->service->getStudentLogged($request);
+
             $teacherId = $request->get('teacherId');
             $areaId = $request->get('areaId');
 

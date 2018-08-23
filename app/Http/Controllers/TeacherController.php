@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use JWTAuth;
 use App\Teacher;
 use App\Student;
 use App\User;
@@ -56,10 +57,11 @@ class TeacherController extends Controller
     /**
      * Display the specified resource.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Request $request, $id)
     {
         try
         {
@@ -70,7 +72,7 @@ class TeacherController extends Controller
                 return response()->json(["data" => false, "error" => "Teacher not found"]);
             }
 
-            return response()->json(['data' => true, 'user' => [$user['user'], 'teacher' => $user['teacher']]]);
+            return response()->json(['data' => true, 'user' => $user['user'], 'teacher' => $user['teacher']]);
         }
         catch (\Exception $e)
         {
@@ -98,6 +100,8 @@ class TeacherController extends Controller
     {
         try
         {
+            $this->service->getTeacherLogged($request);
+
             $user = $this->service->getTeacher($id);
 
             if($user == false)
@@ -133,6 +137,8 @@ class TeacherController extends Controller
     {
         try
         {
+            $this->service->getTeacherLogged($request);
+
             $user = $this->service->getTeacher($id);
 
             if($user == false)
@@ -165,8 +171,7 @@ class TeacherController extends Controller
     public function teacherAcepptStudent($answer, $id)
     {
         try
-        {
-            
+        {            
             \DB::beginTransaction();
 
             $notificable = $this->notificableTeacher->find($id);

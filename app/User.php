@@ -14,6 +14,11 @@ class User extends Authenticatable implements JWTSubject
         'cpf',
         'is_verified'
     ];
+
+    protected $hidden = [
+        'id',
+        'updated_at'
+    ];
     
     /**
      * Get the identifier that will be stored in the subject claim of the JWT.
