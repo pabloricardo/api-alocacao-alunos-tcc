@@ -5,13 +5,15 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use DB;
 
-class OcupationArea extends Model
+class NotificableTeacher extends Model
 {
     protected $fillable = [
+        'teacherGuide',
+        'answered',
+        'teacherId',
+        'studentId',
         'areaId',
-        'teacherId'
     ];
-
 
     /**
      * Table teachers relationship with user
@@ -22,7 +24,15 @@ class OcupationArea extends Model
     }
 
     /**
-     * Table teachers relationship with user
+     * Table student relationship with user
+     */
+    public function students()
+    {
+        return $this->hasMany('App\Student', 'studentId');
+    }
+
+    /**
+     * Table student relationship with user
      */
     public function areas()
     {

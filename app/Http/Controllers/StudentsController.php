@@ -6,12 +6,21 @@ use Illuminate\Http\Request;
 
 use App\Student;
 use App\User;
+use App\NotificableTeacher;
+use App\Teacher;
+use App\Area;
+use Mail;
 
 use App\Service\UserService;
 
 class StudentsController extends Controller
 {
     private $service;
+    private $notificableTeacher;
+    private $teacher;
+    private $user;
+    private $area;
+    private $student;
 
     /**
      * Construct
@@ -19,6 +28,11 @@ class StudentsController extends Controller
     public function __construct()
     {
         $this->service = new UserService();
+        $this->notificableTeacher = new NotificableTeacher();
+        $this->teacher = new Teacher();
+        $this->user = new User();
+        $this->area = new Area();
+        $this->student = new Student();
     }
 
     /**
@@ -141,6 +155,75 @@ class StudentsController extends Controller
             \DB::commit();
 
             return response()->json(['data' => true, 'message' => 'Student deleted']);
+        }
+        catch (\Exception $e)
+        {
+            \DB::rollBack();
+            return response()->json(["data" => false, "error" => $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Student request a teacher to guide on TCC
+     * 
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id id student
+     * @return \Illuminate\Http\Response
+     */
+    public function studentRequestTeacher(request $request, $id)
+    {
+        try
+        {
+            \DB::beginTransaction();
+            $teacherId = $request->get('teacherId');
+            $areaId = $request->get('areaId');
+
+            $teacherUse = $this->teacher->find($teacherId);
+            $studentUse = $this->student->find($id);
+
+            $numberStudents = $this->student->getNumberStudetnsByTeacher($teacherId);
+            
+            if(!$teacherUse || $numberStudents[0]->numberStudents >= $teacherUse->studentLimit)
+            {
+                \DB::rollBack();
+                return response()->json(["data" => false, "error" => "Error on request"]);
+            }
+            
+            $userteacher = $this->user->find($teacherUse->userId);
+            $userStudent = $this->user->find($studentUse->userId);
+            $area        = $this->area->find($areaId);
+            
+            if (!$userteacher || !$userStudent || !$area)
+            {
+                \DB::rollBack();
+                return response()->json(["data" => false, "error" => "Error on request"]);
+            }
+
+            $notificable = $this->notificableTeacher->create([
+                'teacherGuide' => 'NO',
+                'answered' => 'NO',
+                'teacherId' => $teacherId,
+                'studentId' => $id,
+                'areaId' => $areaId
+            ]);
+
+            $name        = $userteacher->name;
+            $nameStudent = $userStudent->name;
+            $email       = $userteacher->email;
+            $nameArea    = $area->name;
+
+            $subject = "New Request of studetn to guide.";
+
+            Mail::send('email.request', ['name' => $name, 'email' => $email, 'nameStudent' => $nameStudent, 'idNotificable' => $notificable->id, "nameArea" => $nameArea],
+                function ($mail) use ($email, $name, $subject) {
+                    $mail->from("noreplay@alocacaoalunostcc.com", "Alocação alunos TCC");
+                    $mail->to($email, $name);
+                    $mail->subject($subject);
+                }
+            );
+
+            \DB::commit();
+            return response()->json(["data" => true, "message" => "Notifation send to your teacher"]);
         }
         catch (\Exception $e)
         {

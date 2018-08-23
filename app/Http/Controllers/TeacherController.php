@@ -4,13 +4,18 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Teacher;
+use App\Student;
 use App\User;
+use App\NotificableTeacher;
 
 use App\Service\UserService;
 
 class TeacherController extends Controller
 {
     private $service;
+    private $student;
+    private $notificableTeacher;
+    private $user;
 
     /**
      * Construct
@@ -18,6 +23,9 @@ class TeacherController extends Controller
     public function __construct()
     {
         $this->service = new UserService();
+        $this->student = new Student();
+        $this->notificableTeacher = new NotificableTeacher();
+        $this->user = new User();
     }
 
     /**
@@ -140,6 +148,59 @@ class TeacherController extends Controller
             \DB::commit();
 
             return response()->json(['data' => true, 'message' => 'Teacher deleted']);
+        }
+        catch (\Exception $e)
+        {
+            \DB::rollBack();
+            return response()->json(["data" => false, "error" => $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Function for teacher accept request of student
+     * *
+     * @param  \Illuminate\Http\Request  $request
+     * @param int $id Teacher
+     */
+    public function teacherAcepptStudent($answer, $id)
+    {
+        try
+        {
+            
+            \DB::beginTransaction();
+
+            $notificable = $this->notificableTeacher->find($id);
+            
+            if(!$notificable)
+            {
+                return response()->json(["data" => false, "error" => "Error on request"]);
+            }
+            
+            $notificable->update([
+                'teacherGuide' => $answer,
+                'answered' => 'YES'
+            ]);
+            
+            /**
+             * fazer update na tabela de usuarios com o id do professor
+             */
+            if($answer == "YES")
+            {
+                $student = $this->student->find($notificable->studentId);
+
+                if(!$student)
+                {
+                    \DB::rollBack();
+                    return response()->json(["data" => false, "error" => "Error on request"]);
+                }
+
+                $student->update([
+                    'teacherId' => $notificable->teacherId
+                ]);
+            }
+
+            \DB::commit();
+            return response()->json(["data" => true, "message" => "Answer ok!"]);
         }
         catch (\Exception $e)
         {

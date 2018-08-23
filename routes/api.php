@@ -20,10 +20,23 @@ Route::get('/', function(){
 Route::post('register', 'AuthController@register');
 Route::post('login', 'AuthController@login');
 
-Route::resource('student', 'StudentsController', ['except' => [
-    'store', 'index'
-]]);
+Route::group(['middleware' => ['jwt.auth']], function () {
 
-Route::resource('teacher', 'TeacherController', ['except' => [
-    'store', 'index'
-]]);
+    Route::get('test', function () {
+        return response()->json(['foo' => 'bar']);
+    });
+
+    Route::resource('teacher', 'TeacherController', ['except' => [
+        'store', 'index'
+    ]]);
+
+    Route::resource('student', 'StudentsController', ['except' => [
+        'store', 'index'
+    ]]);
+
+    Route::resource('area', 'AreaController');
+    
+    Route::post('student/request-teacher/{student}', 'StudentsController@studentRequestTeacher');
+
+    Route::post('teacher-accept-student/{teacher}', 'TeacherController@teacherAcepptStudent');
+});
