@@ -208,7 +208,7 @@ class TeacherController extends Controller
             }
 
             \DB::commit();
-            return response()->json(["data" => true, "message" => "Answer ok!"]);
+            return response()->json(Response::toString(true, "Answer ok!"));
         }
         catch (\Exception $e)
         {
