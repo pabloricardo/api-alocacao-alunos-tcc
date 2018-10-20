@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Area;
 use App\OcupationArea;
+use App\Response\Response;
 
 class AreaController extends Controller
 {
@@ -26,7 +27,7 @@ class AreaController extends Controller
     {
         $areas = $this->area->get();
 
-        return response()->json(["data" => true, "area" => $area]);
+        return response()->json(Response::toString(true, '', $area));
     }
 
     /**
@@ -47,18 +48,15 @@ class AreaController extends Controller
     {
         try
         {
-            //$newArea = $this->area->fill($request->all());
-            //$newArea->save();
             $newArea = $this->area->create([
                 'name' => $request->get('name')
             ]);
 
-
-            return response()->json(["data" => true, "message" => "New area created successfully"]);
+            return response()->json(Response::toString(true, 'New area created successfully'));
         }
         catch(\Exeception $e)
         {
-            return response()->json(["data" => false, "error" => $e->getMessage()]);
+            return response()->json(Response::toString(false, $e->getMessage()));
         }
     }
 
@@ -76,16 +74,16 @@ class AreaController extends Controller
 
             if (!$showArea)
             {
-                return response()->json(["data" => false, "error" => "Area not found"]);
+                return response()->json(Response::toString(false, "Area not found"));
             }
             else
             {
-                return response()->json(["data" => true, "areas" => $showArea]);
+                return response()->json(Response::toString(true, '', $showArea));
             }
         } 
         catch (\Exeception $e)
         {
-            return response()->json(["data" => false, "error" => $e->getMessage()]);
+            return response()->json(Response::toString(false, $e->getMessage()));
         }
     }
 
@@ -113,18 +111,18 @@ class AreaController extends Controller
 
             if(!$updateArea)
             {
-                return response()->json(["data" => false, "error" => "Area not found"]);
+                return response()->json(Response::toString(false, "Area not found"));
             }
 
             $newArea = $updateArea->fill($request->all());
 
             $newArea->save();
 
-            return response()->json(["data" => true, "message" => "Area updated"]);
+            return response()->json(Response::toString(true, 'Area updated'));
         }
         catch (\Exeception $e)
         {
-            return response()->json(["data" => false, "error" => $e->getMessage()]);
+            return response()->json(Response::toString(false, $e->getMessage()));
         }
     }
 
@@ -142,17 +140,17 @@ class AreaController extends Controller
 
             if(!$deleteArea)
             {
-                return response()->json(["data" => false, "error" => "Area not found"]);
+                return response()->json(Response::toString(false, "Area not found"));
             }
 
             $deleteArea->delete();
 
-            return response()->json(["data" => true, "message" => "Area and your dependecies were deleted successfully"]);
+            return response()->json(Response::toString(true, 'Area and your dependecies were deleted successfully'));
 
         } 
         catch (\Exeception $e)
         {
-            return response()->json(["data" => false, "error" => $e->getMessage()]);
+            return response()->json(Response::toString(false, $e->getMessage()));
         }
     }
 }

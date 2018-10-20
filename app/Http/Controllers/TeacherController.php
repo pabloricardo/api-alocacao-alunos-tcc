@@ -3,11 +3,12 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use JWTAuth;
 use App\Teacher;
 use App\Student;
 use App\User;
 use App\NotificableTeacher;
-
+use App\Response\Response;
 use App\Service\UserService;
 
 class TeacherController extends Controller
@@ -51,15 +52,41 @@ class TeacherController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-    {   }
+    { 
+        try 
+        {
+            
+            \DB::beginTransaction();
+
+            $novoProfessor = $this->service->criarUsuario($request);
+
+            if (!$novoProfessor) 
+            {
+                \DB::rollBack();
+                return response()->json(Response::toString(false, "Nao foi possível criar professor"));
+            }
+
+            $novoProfessor->areas = $this->service->alocarProfessorArea($request, $novoProfessor->matricula);
+            
+            \DB::commit();
+            return response()->json(Response::toString(true, 'Professor criado', ["dados" => $novoProfessor]));
+        }
+        catch (\Exception $e)
+        {
+            \DB::rollBack();
+            return response()->json(Response::toString(false, $e->getMessage()));
+        }
+    }
 
     /**
      * Display the specified resource.
      *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Request $request, $id)
     {
         try
         {
@@ -67,14 +94,14 @@ class TeacherController extends Controller
 
             if($user == false)
             {
-                return response()->json(["data" => false, "error" => "Teacher not found"]);
+                return response()->json(Response::toString(false, "Teacher not found"));
             }
-
-            return response()->json(['data' => true, 'user' => [$user['user'], 'teacher' => $user['teacher']]]);
+            
+            return response()->json(Response::toString(true, '', $user));
         }
         catch (\Exception $e)
         {
-            return response()->json(["data" => false, "error" => $e->getMessage()]);
+            return response()->json(Response::toString(false, $e->getMessage()));
         }
     }
 
@@ -98,11 +125,13 @@ class TeacherController extends Controller
     {
         try
         {
+            $this->service->getTeacherLogged($request);
+
             $user = $this->service->getTeacher($id);
 
             if($user == false)
             {
-                return response()->json(["data" => false, "error" => "Teacher not found"]);
+                return response()->json(Response::toString(false, "Teacher not found"));
             }
 
             \DB::beginTransaction();
@@ -114,45 +143,49 @@ class TeacherController extends Controller
             $user['teacher']->save();
 
             \DB::commit();
-            return response()->json(['data' => true, 'message' => 'Teacher updated']);
+            return response()->json(Response::toString(true, "Teacher updated"));
         }
         catch (\Exception $e)
         {
             \DB::rollBack();
-            return response()->json(["data" => false, "error" => $e->getMessage()]);
+            return response()->json(Response::toString(false, $e->getMessage()));
         }
     }
 
     /**
      * Remove the specified resource from storage.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         try
         {
+            $this->service->getTeacherLogged($request);
+
             $user = $this->service->getTeacher($id);
 
             if($user == false)
             {
-                return response()->json(["data" => false, "error" => "Teacher not found"]);
+                return response()->json(Response::toString(false, "Teacher not found"));
             }
 
             \DB::beginTransaction();
 
+            $user['teacher']->notificableTeacher()->delete();
             $user['teacher']->delete();
             $user['user']->delete();
 
             \DB::commit();
 
-            return response()->json(['data' => true, 'message' => 'Teacher deleted']);
+            return response()->json(Response::toString(true, "Teacher deleted"));
         }
         catch (\Exception $e)
         {
             \DB::rollBack();
-            return response()->json(["data" => false, "error" => $e->getMessage()]);
+            return response()->json(Response::toString(false, $e->getMessage()));
         }
     }
 
@@ -165,15 +198,14 @@ class TeacherController extends Controller
     public function teacherAcepptStudent($answer, $id)
     {
         try
-        {
-            
+        {            
             \DB::beginTransaction();
 
             $notificable = $this->notificableTeacher->find($id);
             
             if(!$notificable)
             {
-                return response()->json(["data" => false, "error" => "Error on request"]);
+                return response()->json(Response::toString(false, "Error on request"));
             }
             
             $notificable->update([
@@ -191,7 +223,7 @@ class TeacherController extends Controller
                 if(!$student)
                 {
                     \DB::rollBack();
-                    return response()->json(["data" => false, "error" => "Error on request"]);
+                    return response()->json(Response::toString(false, "Error on request"));
                 }
 
                 $student->update([
@@ -200,12 +232,12 @@ class TeacherController extends Controller
             }
 
             \DB::commit();
-            return response()->json(["data" => true, "message" => "Answer ok!"]);
+            return response()->json(Response::toString(true, "Answer ok!"));
         }
         catch (\Exception $e)
         {
             \DB::rollBack();
-            return response()->json(["data" => false, "error" => $e->getMessage()]);
+            return response()->json(Response::toString(false, $e->getMessage()));
         }
     }
 }

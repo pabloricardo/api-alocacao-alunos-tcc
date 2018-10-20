@@ -12,12 +12,17 @@ class Teacher extends Model
         'userId',
     ];
 
+    protected $hidden = [
+        'updated_at',
+        'user_id'
+    ];
+
     /**
      * Table teacher relationship with user
      */
     public function users()
     {
-        return $this->belongsTo('App\User');
+        return $this->belongsTo('App\User', 'userId');
     }
 
     /**

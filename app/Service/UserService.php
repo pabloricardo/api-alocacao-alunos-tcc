@@ -5,6 +5,8 @@ use Illuminate\Http\Request;
 use App\Student;
 use App\Teacher;
 use App\User;
+use App\Usuario;
+use App\OcupationArea;
 
 class UserService extends Service
 {
@@ -18,6 +20,8 @@ class UserService extends Service
         $this->student  = new Student();
         $this->teacher = new Teacher();
         $this->user     = new User();
+        $this->usuario     = new Usuario();
+        $this->ocupationArea     = new OcupationArea();
     }
 
     /**
@@ -42,6 +46,61 @@ class UserService extends Service
         }
 
         return $returnUser;
+    }
+
+    /**
+     * 
+     */
+    public function criarUsuario(Request $request) 
+    {
+        
+        try 
+        {
+            $novoUsuario = $this->usuario->create([
+                'nome' => $request->get('nome'),
+                'matricula' => $request->get('matricula'),
+                'email' => $request->get('email'),
+                'disciplina' => $request->get('disciplina'),
+                'quantidade_orientacoes' => $request->get('quantidade_orientacoes'),
+                'status' => $request->get('status'),
+                'descricao' => $request->get('descricao')
+            ]);
+
+            return $novoUsuario;
+        }
+        catch (Exeception $e)
+        {
+            throw new Exception("Error ao criar usuario", 0, $e);
+        }
+    }
+
+    /**
+     * 
+     */
+    public function alocarProfessorArea(Request $request, $professorId)
+    {
+        try 
+        {
+            $retornoAlocacaoProfessor = [];
+
+            if(is_array($request->get('areas')))
+            {
+                
+                foreach ($request->get('areas') as $key => $value) {
+                    
+                    $retornoAlocacaoProfessor[] = $this->ocupationArea->create([
+                        'id_area' => $value['id'],
+                        'matricula' => $professorId
+                    ]);
+                }
+            }            
+
+            return $retornoAlocacaoProfessor;
+        }
+        catch (Exeception $e)
+        {
+            throw new Exception("Error ao alocar professor na area", 0, $e);
+        }        
     }
 
     /**
@@ -97,15 +156,15 @@ class UserService extends Service
      * @param int $userID
      * @return bool or object $response
      */
-    public function getStudent($userID)
+    public function getStudent($studentID)
     {
-        $user = User::find($userID);
+        $student = $this->student->find($studentID);
 
-        if($user)
+        if($student)
         {
-            $student = $user->students()->first();
+            $user = $student->users()->first();
 
-            if(!$student)
+            if(!$user)
             {
                 return false;
             }
@@ -123,15 +182,16 @@ class UserService extends Service
      * @param int $userID
      * @return bool or object $response
      */
-    public function getTeacher($userID)
+    public function getTeacher($teacherID)
     {
-        $user = User::find($userID);
-
-        if($user)
+        $teacher = $this->usuario->find($teacherID);
+        
+        print_r($teacher); exit;
+        /*if($teacher)
         {
-            $teacher = $user->teachers()->first();
-
-            if(!$teacher)
+            $user = $teacher->users()->first();
+            
+            if(!$user)
             {
                 return false;
             }
@@ -139,7 +199,7 @@ class UserService extends Service
             $response = ['user' => $user, "teacher" => $teacher];
 
             return $response;
-        }
+        }*/
 
         return false;
     }

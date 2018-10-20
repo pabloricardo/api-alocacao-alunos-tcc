@@ -7,13 +7,18 @@ use DB;
 
 class OcupationArea extends Model
 {
+    public $incrementing = false;
+
+    public $timestamps = false; 
+
+    protected $table = "area_professores";
+
     protected $fillable = [
-        'areaId',
-        'teacherId'
+        'id_area',
+        'matricula'
     ];
 
-
-    /**
+   /**
      * Table teachers relationship with user
      */
     public function teachers()
