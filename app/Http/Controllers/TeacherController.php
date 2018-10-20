@@ -52,7 +52,31 @@ class TeacherController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-    {   }
+    { 
+        try 
+        {
+            
+            \DB::beginTransaction();
+
+            $novoProfessor = $this->service->criarUsuario($request);
+
+            if (!$novoProfessor) 
+            {
+                \DB::rollBack();
+                return response()->json(Response::toString(false, "Nao foi possível criar professor"));
+            }
+
+            $novoProfessor->areas = $this->service->alocarProfessorArea($request, $novoProfessor->matricula);
+            
+            \DB::commit();
+            return response()->json(Response::toString(true, 'Professor criado', ["dados" => $novoProfessor]));
+        }
+        catch (\Exception $e)
+        {
+            \DB::rollBack();
+            return response()->json(Response::toString(false, $e->getMessage()));
+        }
+    }
 
     /**
      * Display the specified resource.
