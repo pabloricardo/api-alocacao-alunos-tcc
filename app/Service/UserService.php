@@ -56,7 +56,7 @@ class UserService extends Service
         
         try 
         {
-            $novoUsuario = $this->usuario->create([
+            $novoUsuario = Usuario::create([
                 'nome' => $request->get('nome'),
                 'matricula' => $request->get('matricula'),
                 'email' => $request->get('email'),
