@@ -56,6 +56,8 @@ class UserService extends Service
         
         try 
         {
+            $descricao = $request->get('descricao') == "" ? "" : $request->get('descricao');
+            
             $novoUsuario = Usuario::create([
                 'nome' => $request->get('nome'),
                 'matricula' => $request->get('matricula'),
@@ -63,7 +65,7 @@ class UserService extends Service
                 'disciplina' => $request->get('disciplina'),
                 'quantidade_orientacoes' => $request->get('quantidade_orientacoes'),
                 'status' => $request->get('status'),
-                'descricao' => $request->get('descricao')
+                'descricao' => $descricao
             ]);
 
             return $novoUsuario;
@@ -85,11 +87,9 @@ class UserService extends Service
 
             if(is_array($request->get('areas')))
             {
-                
                 foreach ($request->get('areas') as $key => $value) {
-                    
                     $retornoAlocacaoProfessor[] = $this->ocupationArea->create([
-                        'id_area' => $value['id'],
+                        'id_area' => $value,
                         'matricula' => $professorId
                     ]);
                 }
