@@ -24,7 +24,7 @@ Route::get('obter/professor/{professor}', 'TeacherController@show');
 
 Route::post('professor/cadastrar', 'TeacherController@store');
 
-/*
+
 Route::group(['middleware' => ['jwt-auth']], function () {
 
     Route::get('test', function () {
@@ -47,4 +47,3 @@ Route::group(['middleware' => ['jwt-auth']], function () {
 
     Route::post('teacher-accept-student/{teacher}', 'TeacherController@teacherAcepptStudent');
 });
-*/
