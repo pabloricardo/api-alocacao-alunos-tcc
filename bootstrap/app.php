@@ -41,6 +41,9 @@ $app->singleton(
     App\Exceptions\Handler::class
 );
 
+header('Acess-Control-Allow-Origin: *');
+header('Acess-Control-Allow-Methods: *');
+header('Acess-Control-Allow-Headers: *');
 /*
 |--------------------------------------------------------------------------
 | Return The Application

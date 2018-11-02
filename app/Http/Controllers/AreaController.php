@@ -49,10 +49,10 @@ class AreaController extends Controller
         try
         {
             $newArea = $this->area->create([
-                'name' => $request->get('name')
+                'nome' => $request->get('nome')
             ]);
 
-            return response()->json(Response::toString(true, 'New area created successfully'));
+            return response()->json(Response::toString(true, 'Area criada com sucesso'));
         }
         catch(\Exeception $e)
         {

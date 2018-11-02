@@ -6,23 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class Area extends Model
 {
+    protected $primaryKey = "id_area";
+
+    protected $table = "area";
+
+    public $timestamps = false;
+
     protected $fillable = [
-        'name'
+        "nome_da_area"
     ];
-
-    /**
-     * Table teacher relationship with user
-     */
-    public function ocupationArea()
-    {
-        return $this->belongsTo('App\OcupationArea', 'areaId');
-    }
-
-    /**
-     * Table teacher relationship with user
-     */
-    public function notificableTeacher()
-    {
-        return $this->belongsTo('App\NotificableTeacher', 'areaId');
-    }
 }
