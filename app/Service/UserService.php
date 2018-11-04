@@ -6,6 +6,7 @@ use App\Student;
 use App\Teacher;
 use App\User;
 use App\Usuario;
+use App\Professor;
 use App\OcupationArea;
 
 class UserService extends Service
@@ -51,14 +52,14 @@ class UserService extends Service
     /**
      * 
      */
-    public function criarUsuario(Request $request) 
+    public function criarProfessor(Request $request) 
     {
         
         try 
         {
             $descricao = $request->get('descricao') == "" ? "" : $request->get('descricao');
             
-            $novoUsuario = Usuario::create([
+            $novoProfessor = Professor::create([
                 'nome' => $request->get('nome'),
                 'matricula' => $request->get('matricula'),
                 'email' => $request->get('email'),
@@ -66,6 +67,27 @@ class UserService extends Service
                 'quantidade_orientacoes' => $request->get('quantidade_orientacoes'),
                 'status' => $request->get('status'),
                 'descricao' => $descricao
+            ]);
+
+            return $novoProfessor;
+        }
+        catch (Exeception $e)
+        {
+            throw new Exception("Error ao criar professor", 0, $e);
+        }
+    }
+
+        /**
+     * 
+     */
+    public function criarUsuario(Request $request)
+    {
+        try
+        {
+            $novoUsuario = Usuario::create([
+                'matricula' => $request->get('matricula'),
+                'senha' => $request->get('matricula'),
+                'permissao' => 2
             ]);
 
             return $novoUsuario;
@@ -100,7 +122,7 @@ class UserService extends Service
         catch (Exeception $e)
         {
             throw new Exception("Error ao alocar professor na area", 0, $e);
-        }        
+        }
     }
 
     /**

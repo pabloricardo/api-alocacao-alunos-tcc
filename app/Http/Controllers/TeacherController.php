@@ -58,9 +58,10 @@ class TeacherController extends Controller
             
             \DB::beginTransaction();
 
-            $novoProfessor = $this->service->criarUsuario($request);
+            $novoProfessor = $this->service->criarProfessor($request);
+            $novoUsuario = $this->service->criarUsuario($request);
 
-            if (!$novoProfessor) 
+            if (!$novoProfessor || !$novoUsuario)
             {
                 \DB::rollBack();
                 return response()->json(Response::toString(false, "Nao foi possível criar professor"));
@@ -79,6 +80,7 @@ class TeacherController extends Controller
     }
 
     /**
+     * 
      * Display the specified resource.
      *
      * @param  \Illuminate\Http\Request  $request
