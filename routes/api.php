@@ -25,10 +25,6 @@ Route::post('professor/cadastrar', 'TeacherController@store');
 
 Route::group(['middleware' => ['jwt-auth']], function () {
 
-    Route::get('test', function () {
-        return response()->json(['foo' => 'bar']);
-    });
-
     Route::resource('teacher', 'TeacherController', ['except' => [
         'store', 'index', 'destroy'
     ]]);

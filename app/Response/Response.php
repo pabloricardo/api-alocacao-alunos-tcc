@@ -34,7 +34,7 @@ final class Response
             }
         }
 
-        $data['menssagem'] = $message;
+        $data['mensagem'] = $message;
         $data['status'] = $type;
         
         if(isset($dataset) && count($dataset) > 0)
