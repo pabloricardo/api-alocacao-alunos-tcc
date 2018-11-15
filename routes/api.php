@@ -13,9 +13,7 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::get('/', function(){
-    return response()->json(['status' => 'OK', 'message' => 'API connected']);
-});
+Route::get('/', "HomeController@home");
 
 Route::post('register', 'AuthController@register');
 Route::post('login', 'AuthController@login');

@@ -11,9 +11,7 @@
 |
 */
 
-Route::get('/', function () {
-    return redirect('api');
-});
+Route::get('/', 'HomeController@toApi');
 
 Route::get('user/verify/{verification_code}', 'AuthController@verifyUser');
 Route::get('teacher-accept-student/{answer}/{notificable}', 'TeacherController@teacherAcepptStudent');
